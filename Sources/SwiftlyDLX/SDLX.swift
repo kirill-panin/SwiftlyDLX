@@ -68,6 +68,15 @@ public struct SDLX {
         }
     }
     
+    public mutating func solve(_ rows: Set<Int>) -> Set<Int>? {
+        guard let cache = grid.cover(rows) else {
+            print("This combination of values causes an error")
+            return nil
+        }
+        defer{grid.uncover(cache)}
+        return generate{$0}
+    }
+    
     @discardableResult
     public mutating func generate(each: (Set<Int>) -> Set<Int>?) -> Set<Int>? {
         guard let column = pickColumn() else {

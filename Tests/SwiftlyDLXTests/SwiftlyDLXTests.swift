@@ -48,6 +48,7 @@ func ConvertSolutionToPuzzle(_ solution: Set<Int>) -> [Int] {
     }
     return p
 }
+
 func CreateSudokuDLX() -> [Set<Int>] {
     return (0..<729).map{
         let value = $0%9

@@ -39,6 +39,17 @@ public struct SDLXGrid {
         return cache
     }
     
+    public mutating func cover(_ rows: Set<Int>) -> Set<Int>? {
+        var cache: Set<Int> = []
+        for i in rows {
+            guard let c = cover(i) else {
+                uncover(cache)
+                return nil
+            }
+            cache.formUnion(c)
+        }
+        return cache
+    }
     public mutating func uncover(_ cache: Set<Int>) {
         for r in cache {
             for c in rows[r] {
