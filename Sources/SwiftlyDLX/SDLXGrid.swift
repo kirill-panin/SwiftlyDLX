@@ -62,6 +62,7 @@ public struct SDLXGrid {
     
     public mutating func removeColumns(for row: Int) -> Set<Int>? {
         var cache: Set<Int> = []
+        print(row)
         for c in rows[row] {
             guard let nc = columns.removeValue(forKey: c) else {
                 uncover(cache)

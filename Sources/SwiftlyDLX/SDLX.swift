@@ -65,7 +65,7 @@ public struct SDLX {
      
      This is a general use method of implementing the generate method however generate can be used in other methods.
      */
-    public mutating func solve(_ rows: Set<Int> = [], _ times: Int) -> Set<Int>? {
+    public mutating func solve(_ rows: Set<Int> = [], _ times: Int = 1) -> Set<Int>? {
         guard let cache = grid.cover(rows) else {
             print("This is an unsolvable set of rows")
             return nil

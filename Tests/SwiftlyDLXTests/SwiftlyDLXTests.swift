@@ -10,13 +10,20 @@ final class SwiftlyDLXTests: XCTestCase {
     func testExample() throws {
         let g = CreateSudokuDLX()
         var dlx = SDLX(exactCover: g)
-        var count = 0
-        dlx.generate{solution in
-            count += 1
-            print("Solution #\(count)")
-            PrintSolutionAsPuzzle(solution)
-            return count == 3 ? solution:nil
-        }
+        let PUZZLE: [Int] = [
+        8,0,0,0,0,0,0,0,0,
+        0,0,3,6,0,0,0,0,0,
+        0,7,0,0,9,0,2,0,0,
+        0,5,0,0,0,7,0,0,0,
+        0,0,0,1,0,0,0,3,0,
+        0,0,1,0,0,0,0,6,8,
+        0,0,8,5,0,0,0,1,0,
+        0,9,0,0,0,0,4,0,0,
+        ]
+        let rs = Set(PUZZLE.enumerated().filter{(i, v) in return v>0}.map{$0*9+($1-1)})
+        print(rs)
+        guard let solution = dlx.solve(rs) else {throw TestError.runtime("Unable to solve this puzzle")}
+        PrintSolutionAsPuzzle(solution)
         XCTAssertEqual(SwiftlyDLX().text, "Hello, World!")
     }
 }
