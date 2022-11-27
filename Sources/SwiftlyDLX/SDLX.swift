@@ -36,13 +36,6 @@ public struct SDLX {
         self.grid = SDLXGrid(rs)
     }
     
-    //TODO: - Set up generic initializer to handle both array and set arguments
-    /**
-     Initialization accepts a 2 dimensional Int array. The top level should be the rows the second level should be an array of column indices
-     */
-    public init(exactCover grid: [[Int]]) {
-        self.grid = SDLXGrid(grid.map{Set($0)})
-    }
     
     /**
      Initialization accepts an array of integer Sets. This should essencially be the representation of the rows being used.

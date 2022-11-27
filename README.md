@@ -1,4 +1,4 @@
-# SwiftlyDLX
+# SwiftlyDLX 
 
 Swiftly DLX is an attempt at providing a simple but efficient Algorithm X method. If you are not familiar with Knuth's Dancing links algorithm I suggest you read his paper https://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/0011047.pdf
 
@@ -55,7 +55,8 @@ let boxFilled = box * 9 + value
 
 ```
 
-#### Putting it all together. Now that all of the component parts are worked out the Exact cover grid can be represented in a series of sets within an array.
+#### Putting it all together. 
+Now that all of the component parts are worked out the Exact cover grid can be represented in a series of sets within an array.
 
 ```swift
 var XCoverGrid : [Set<Int>] = []
@@ -124,13 +125,24 @@ puzzle[index] = value
 | 6 | 9 | 2 | 3 | 8 | 1 | 4 | 5 | 7 |
 | 5 | 1 | 7 | 2 | 6 | 4 | 8 | 9 | 3 |
 
-9|5|6||8|3|7||1|2|4
-7|8|4||1|2|6||5|3|9
-2|3|1||9|4|5||7|6|8
-___________________
-3|4|8||5|7|9||6|1|2
-6|9|2||3|8|1||4|5|7
-5|1|7||2|6|4||8|9|3
+## Dancing Links
+Dancing links is an algorithm to solve a subset of NP-Complete problems referred to as exact cover problems. Exact cover problems are problems in which the solution is a subset of all possible partial values which satisfy a set of constraints. 
+
+## Documentation
+
+### Initializers
+
+Each initializer handles a representation of an exact cover grid
+
+#### init(exactCover grid: [[Bool]])
+This method is a 2D array of Boolean. Intersections between row and column are represented with TRUE.
+
+#### init(exactCover grid: [Set<Int>])
+This method is an array of integer sets. Each integer being a column that row intersects with. 
+
+
+
+
 
 
 
