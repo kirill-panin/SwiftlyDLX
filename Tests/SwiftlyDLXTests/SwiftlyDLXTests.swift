@@ -10,6 +10,18 @@ final class SwiftlyDLXTests: XCTestCase {
     func testExample() throws {
         let g = CreateSudokuDLX()
         var dlx = SDLX(exactCover: g)
+        print(dlx.grid.columns.count)
+        let HARDEST: [Int] = [
+            3,6,0,0,0,0,5,0,0,
+            0,0,0,0,0,1,0,4,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,3,0,7,0,8,0,0,
+            2,0,4,0,0,0,0,0,0,
+            1,0,0,0,0,0,0,0,0,
+            0,0,0,3,0,0,0,1,0,
+            0,7,0,0,0,0,0,0,2,
+            0,0,0,9,5,0,0,0,0
+        ]
         let PUZZLE: [Int] = [
         8,0,0,0,0,0,0,0,0,
         0,0,3,6,0,0,0,0,0,
@@ -20,18 +32,26 @@ final class SwiftlyDLXTests: XCTestCase {
         0,0,8,5,0,0,0,1,0,
         0,9,0,0,0,0,4,0,0,
         ]
-        let rs = Set(PUZZLE.enumerated().filter{(i, v) in return v>0}.map{$0*9+($1-1)})
-        print(rs)
+        let rs = Set(HARDEST.enumerated().filter{(i, v) in return v>0}.map{$0*9+($1-1)})
         guard let solution = dlx.solve(rs) else {throw TestError.runtime("Unable to solve this puzzle")}
+        print(dlx.grid.columns.count)
         PrintSolutionAsPuzzle(solution)
+        print(dlx.history.count, solution.count)
+        
+        guard let simp = try dlx.simplify(solution, 20) else {throw TestError.runtime("Unable to simplify to expected size")}
+        
+        PrintSolutionAsPuzzle(simp)
         XCTAssertEqual(SwiftlyDLX().text, "Hello, World!")
     }
+}
+func ps(_ v: Int) -> String {
+    return v == 0 ? " ":"\(v)"
 }
 func PrintSolutionAsPuzzle(_ solution: Set<Int>) {
     let p = ConvertSolutionToPuzzle(solution)
     let pl : (Int)->() = {
         let n = $0*9
-        print("\(p[n])|\(p[n+1])|\(p[n+2])||\(p[n+3])|\(p[n+4])|\(p[n+5])||\(p[n+6])|\(p[n+7])|\(p[n+8])")
+        print("\(ps(p[n]))|\(ps(p[n+1]))|\(ps(p[n+2]))||\(ps(p[n+3]))|\(ps(p[n+4]))|\(ps(p[n+5]))||\(ps(p[n+6]))|\(ps(p[n+7]))|\(ps(p[n+8]))")
     }
     pl(0)
     pl(1)

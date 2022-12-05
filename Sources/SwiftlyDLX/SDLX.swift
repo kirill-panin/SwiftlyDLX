@@ -12,6 +12,11 @@ import Foundation
  
  For now everything will be public however I dont think the final version will expose all the inner workings
  */
+public enum DLXError : Error {
+    case runtimeError(String)
+}
+
+
 public struct SDLX {
     public var grid : SDLXGrid
     public var history : Set<Int> = []
@@ -54,25 +59,59 @@ public struct SDLX {
     
     
     /**
+     Depreciation notice - This method potentially will return inconsistent nil mean it is either not solvable or not solvable a total number of times. Instead a new method will be made to simplify this and solve will remain a singleton method instead.
      Solve the grid first covering the provided rows and attempt to solve it exactly n number of times
      
      This is a general use method of implementing the generate method however generate can be used in other methods.
      */
-    public mutating func solve(_ rows: Set<Int> = [], _ times: Int = 1) -> Set<Int>? {
+    public mutating func solve(_ rows: Set<Int> = []) -> Set<Int>? {
+        guard let cache = cover(rows) else {return nil}
+        defer{uncover(rows, cache)}
+        
+        return generate{$0}
+    }
+    
+    public mutating func cover(_ row: Int) -> Set<Int>? {
+        guard let cache = grid.cover(row) else {return nil}
+        history += row
+        return cache
+    }
+    
+    public mutating func cover(_ rows: Set<Int>) -> Set<Int>? {
+        guard let cache = grid.cover(rows) else {return nil}
+        history += rows
+        return cache
+    }
+    
+    public mutating func uncover(_ row: Int, _ cache: Set<Int>) {
+        history -= row
+        grid.uncover(cache)
+    }
+    
+    public mutating func uncover(_ rows: Set<Int>, _ cache: Set<Int>) {
+        history -= rows
+        grid.uncover(cache)
+    }
+    
+    /**
+     Attempts to find n number of solutions with the given partial set of solutions
+     */
+    public mutating func attempt(rows: Set<Int> = [],_ times: Int) -> Set<Set<Int>> {
+        var solutions : Set<Set<Int>> = []
         guard let cache = grid.cover(rows) else {
-            print("This is an unsolvable set of rows")
-            return nil
-        }
+            print("This is not a solvable partial")
+            return solutions}
         history += rows
         defer{
             grid.uncover(cache)
             history -= rows
         }
-        var count = 0
-        return generate{
-            count += 1
-            return count == times ? $0:nil
+        
+        generate{
+            solutions += $0
+            return solutions.count == times ? $0:nil
         }
+        return solutions
     }
     
     @discardableResult
@@ -81,17 +120,84 @@ public struct SDLX {
             return each(history)
         }
         for r in column {
-            guard let cache = grid.cover(r) else {continue}
-            history += r
-            defer{
-                history -= r
-                grid.uncover(cache)
-            }
-            guard let solution = generate(each: each) else {continue}
-            return solution
+            guard let cache = cover(r) else {continue}
+            defer{uncover(r, cache)}
+            if let solution = generate(each: each) { return solution }
         }
         return nil
     }
+    
+    /**
+     This is an experimental method which will try to determine a partial solution that only has one possible solution.
+     */
+    
+    
+    public mutating func simplify(_ master: Set<Int>,_ size: Int) -> Set<Int>? {
+        var partial: Set<Int> = []
+        var attempts: Int = 0
+        var topLevel: Int = 0
+        func cmb(_ remaining: Set<Int>,_ top: Bool = false) -> Set<Int>? {
+            guard partial.count < size else {
+                attempts += 1
+                let valid = attempt(2).count == 1
+                print("Attempt \(attempts) \(valid) \(remaining.count) \(topLevel)")
+                return valid ? partial:nil
+            }
+            var rem = remaining
+            for r in filterByWeight(remaining) {
+                if top {
+                    topLevel += 1
+                }
+                guard partial.count + rem.count >= size else {
+                    print("No point in proceeding")
+                    return nil
+                }
+                guard let cache = cover(r) else {
+                    print("This shouldn't be able to happen")
+                    return nil
+                }
+                partial += r
+                rem -= r
+                defer{
+                    partial -= r
+                    uncover(r, cache)
+                }
+                guard let p = cmb(rem) else {continue}
+                return p
+            }
+            return nil
+        }
+        return cmb(master, true)
+    }
+    
+    func sortByWeight(_ rows: Set<Int>) -> [Int] {
+        let list = Array(rows)
+        let mags = list.map{grid.rowWeight($0)}
+        return list.indices.sorted{mags[$0] > mags[$1]}.map{list[$0]}
+    }
+    
+    func filterByWeight(_ rows: Set<Int>) -> Set<Int> {
+        let list = Array(rows)
+        let mags = list.map{grid.rowWeight($0)}
+        guard let max = mags.max() else {return []}
+        return Set(list.indices.filter{mags[$0] == max}.map{list[$0]})
+    }
+    
+    func sortRowsByMagnitude(_ rows: Set<Int>) -> [Int] {
+        let list = Array(rows)
+        let mags = list.map{grid.rowMagnitude($0)}
+        return list.indices.sorted{mags[$0] > mags[$1]}.map{list[$0]}
+    }
+    
+    func filterByMagnitude(_ rows: Set<Int>) -> Set<Int> {
+        let list = Array(rows)
+        let mags = list.map{grid.rowMagnitude($0)}
+        guard let max = mags.max() else {return []}
+        return Set(list.indices.filter{mags[$0] == max}.map{list[$0]})
+    }
+
+    
+    
     
     /**
      attempt to find the smallest version of the grid which only has one result. This will have a long runtime and at this time cannot be canceled. The minSize will be a method to for the function to return early if it finds a solution that is  less then or equal to the minimium Size
@@ -130,6 +236,11 @@ public struct SDLX {
         }
         return history
     }
+    
+    
+    //MARK: - Static methods
+    
+    
 }
 
 

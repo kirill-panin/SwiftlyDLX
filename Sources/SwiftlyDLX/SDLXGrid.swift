@@ -62,7 +62,6 @@ public struct SDLXGrid {
     
     public mutating func removeColumns(for row: Int) -> Set<Int>? {
         var cache: Set<Int> = []
-        print(row)
         for c in rows[row] {
             guard let nc = columns.removeValue(forKey: c) else {
                 uncover(cache)
@@ -71,5 +70,28 @@ public struct SDLXGrid {
             cache.formUnion(nc)
         }
         return cache
+    }
+    
+    /**
+     Return the weight of the heaviest column in the grid.
+     */
+    public func rowMagnitude(_ row: Int) -> Int{
+        var n = -1
+        for c in rows[row] {
+            let c = columns[c]?.count ?? 0
+            n = c > n ? c:n
+        }
+        return n
+    }
+    /**
+     This returns the total number of rows associated to this row
+     */
+    public func rowWeight(_ row: Int) -> Int {
+        return rows[row].reduce(Set<Int>(), {(r, i) in
+            if let c = columns[i] {
+                return r + c
+            }
+            return r
+        }).count
     }
 }
