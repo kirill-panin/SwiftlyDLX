@@ -229,7 +229,7 @@ public struct SDLX {
                 grid.uncover(cache)
                 history -= r
             }
-            guard let sol = minimalSolve(minSize) else {continue} //solution was found
+            guard let _ = minimalSolve(minSize) else {continue} //solution was found
             guard solution == nil else {return nil} //previous solution does not exist
             guard history.count > minSize else {return history} //current solution is greater then the minSize parameter
             solution = history //Using history as the returned value will be the second to last.
