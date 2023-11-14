@@ -87,11 +87,12 @@ public struct SDLXGrid {
      This returns the total number of rows associated to this row
      */
     public func rowWeight(_ row: Int) -> Int {
-        return rows[row].reduce(Set<Int>(), {(r, i) in
-            if let c = columns[i] {
-                return r + c
+        var count = 0
+        for columnIndex in rows[row] {
+            if let columnRows = columns[columnIndex] {
+                count += columnRows.count
             }
-            return r
-        }).count
+        }
+        return count
     }
 }
