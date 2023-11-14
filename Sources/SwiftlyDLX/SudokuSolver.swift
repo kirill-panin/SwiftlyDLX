@@ -5,7 +5,7 @@ public class SudokuSolver {
         self.dlx = SDLX(exactCover: createSudokuDLX());
     }
 
-    func createSudokuDLX() -> [Set<Int>] {
+    private func createSudokuDLX() -> [Set<Int>] {
         return (0..<729).map{
             let value = $0%9
             let index = $0/9
@@ -21,7 +21,7 @@ public class SudokuSolver {
         }   
     }
 
-    func solve(puzzle: [[Int]]) -> [[Int]] {
+    public func solve(puzzle: [[Int]]) -> [[Int]] {
         let set = twoDimensionalToSet(matrix: puzzle)
         if let solution = dlx?.solve(set) {
             return setToTwoDimensionalArray(set: solution)
@@ -44,7 +44,7 @@ public class SudokuSolver {
         return matrix
     }
 
-    func isOnlyOneSolution(puzzle: [[Int]]) -> Bool {
+    public func isOnlyOneSolution(puzzle: [[Int]]) -> Bool {
         if let solutions = dlx?.attempt(rows: twoDimensionalToSet(matrix: puzzle), 2) {
             return solutions.count == 1
         }
