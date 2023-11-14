@@ -24,7 +24,8 @@ public class SudokuSolver {
     public func solve(puzzle: [[Int]]) -> [[Int]] {
         let set = twoDimensionalToSet(matrix: puzzle)
         if let solution = dlx?.solve(set) {
-            return setToTwoDimensionalArray(set: solution)
+            let converted = convertSolutionToPuzzle(solution)
+            return arrayToTwoDimensionalArray(array: converted)
         }
         return []
     }
@@ -44,10 +45,30 @@ public class SudokuSolver {
         return matrix
     }
 
+    private func arrayToTwoDimensionalArray(array: [Int]) -> [[Int]] {
+        var matrix: [[Int]] = [[Int]](repeating: [Int](repeating: 0, count: 9), count: 9)
+        for i in 0..<9 {
+            for j in 0..<9 {
+                matrix[i][j] = array[i * 9 + j] 
+            }
+        }
+        return matrix
+    }
+
     public func isOnlyOneSolution(puzzle: [[Int]]) -> Bool {
         if let solutions = dlx?.attempt(rows: twoDimensionalToSet(matrix: puzzle), 2) {
             return solutions.count == 1
         }
         return false
+    }
+
+    private func convertSolutionToPuzzle(_ solution: Set<Int>) -> [Int] {
+        var p = [Int](repeating: 0, count: 81)
+        for i in solution {
+                let value = (i%9)+1
+                let index = i/9
+                p[index] = value
+        }
+        return p
     }
 }
