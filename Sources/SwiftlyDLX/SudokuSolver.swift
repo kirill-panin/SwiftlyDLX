@@ -1,7 +1,7 @@
 public class SudokuSolver {
     private var dlx: SDLX? = nil
 
-    init() {
+    public init() {
         self.dlx = SDLX(exactCover: createSudokuDLX());
     }
 
